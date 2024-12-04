@@ -8,3 +8,17 @@ spec:
   chart: longhorn
   version: 1.5.1
   targetNamespace: storage
+---
+# PVC pour les fichiers musicaux
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: music-storage
+  namespace: apps
+spec:
+  storageClassName: longhorn
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 50Gi

@@ -14,8 +14,22 @@ spec:
         app: music-server
     spec:
       containers:
-      - name: nginx
-        image: nginx:alpine
+      - name: api
+        image: ousmanekk/music-api:latest
+        env:
+        - name: DB_HOST
+          value: "postgres-service"
+        - name: DB_PORT
+          value: "5432"
+        - name: DB_USER
+          value: "postgres"
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: POSTGRES_PASSWORD
+        - name: DB_NAME
+          value: "music_share"
         resources:
           requests:
             memory: "64Mi"
