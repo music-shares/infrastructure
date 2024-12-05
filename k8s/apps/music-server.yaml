@@ -46,5 +46,6 @@ metadata:
 spec:
   ports:
   - port: 80
+    targetPort: 10000
   selector:
     app: music-server
