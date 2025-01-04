@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: minio
-  namespace: kube-system
+  namespace: apps
 spec:
   selector:
     matchLabels:
@@ -29,7 +29,9 @@ spec:
               value: "minio123"
           ports:
             - containerPort: 9000
+              name: api
             - containerPort: 9001
+              name: console
           volumeMounts:
             - name: storage
               mountPath: "/data"
@@ -42,35 +44,6 @@ spec:
               cpu: "500m"
       volumes:
         - name: storage
-          persistentVolumeClaim:
-            claimName: minio-pvc
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: minio-pvc
-  namespace: kube-system
-spec:
-  accessModes:
-    - ReadWriteOnce
-  storageClassName: longhorn
-  resources:
-    requests:
-      storage: 10Gi
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: minio
-  namespace: kube-system
-spec:
-  type: ClusterIP
-  ports:
-    - port: 9000
-      targetPort: 9000
-      name: api
-    - port: 9001
-      targetPort: 9001
-      name: console
-  selector:
-    app: minio
+          hostPath:
+            path: /data/minio
+            type: DirectoryOrCreate

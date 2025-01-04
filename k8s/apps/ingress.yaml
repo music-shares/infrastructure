@@ -55,7 +55,6 @@ spec:
           scheme: h2c
   tls:
     secretName: tls-secret
-    secretNamespace: certs
     
 ---
 
@@ -66,25 +65,3 @@ metadata:
   namespace: argocd
 data:
   server.insecure: "true"
-   
----
-# Longhorn
-apiVersion: traefik.containo.us/v1alpha1
-kind: IngressRoute
-metadata:
-  name: longhorn-route
-  namespace: storage
-  annotations:
-    traefik.ingress.kubernetes.io/router.middlewares: "certs-redirect-https@kubernetescrd"
-    traefik.ingress.kubernetes.io/router.tls: "true"
-spec:
-  entryPoints:
-    - websecure
-  tls:
-    secretName: tls-secret
-  routes:
-  - match: Host(`longhorn.okloud-hub.com`)
-    kind: Rule
-    services:
-    - name: longhorn-frontend
-      port: 80
