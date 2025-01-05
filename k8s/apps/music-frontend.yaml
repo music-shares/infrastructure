@@ -1,0 +1,40 @@
+# frontend-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: music-frontend
+  namespace: apps
+spec:
+  selector:
+    matchLabels:
+      app: music-frontend
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: music-frontend
+    spec:
+      containers:
+      - name: music-frontend
+        image: ousmanekk/music-client:latest
+        ports:
+        - containerPort: 80
+        resources:
+          limits:
+            cpu: "200m"
+            memory: "256Mi"
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: music-frontend
+  namespace: apps
+spec:
+  selector:
+    app: music-frontend
+  ports:
+  - port: 80
+    targetPort: 80

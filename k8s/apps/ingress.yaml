@@ -28,10 +28,10 @@ spec:
     kind: Rule
     services:
     - name: music-server
-      port: 80
+      port: 10000
 
 ---
-apiVersion: traefik.io/v1alpha1
+apiVersion: traefik.containo.us/v1alpha1  # Notez le changement de traefik.io à traefik.containo.us
 kind: IngressRoute
 metadata:
   name: argocd-server
@@ -47,7 +47,7 @@ spec:
         - name: argocd-server
           port: 80
     - kind: Rule
-      match: Host(`argocd.okloud-hub.com`) && Header(`Content-Type`, `application/grpc`)
+      match: Host(`argocd.okloud-hub.com`) && Headers(`Content-Type`, `application/grpc`)  # Notez 'Headers' au lieu de 'Header'
       priority: 11
       services:
         - name: argocd-server
@@ -65,3 +65,23 @@ metadata:
   namespace: argocd
 data:
   server.insecure: "true"
+
+---
+
+# ingress-routes.yaml
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: music-frontend
+  namespace: apps
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`music.okloud-hub.com`)
+      kind: Rule
+      services:
+        - name: music-frontend
+          port: 80
+  tls:
+    secretName: tls-secret
