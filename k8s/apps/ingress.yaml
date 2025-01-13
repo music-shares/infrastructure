@@ -10,25 +10,49 @@ spec:
     permanent: true
 
 ---
-# API
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: cors-music-api
+  namespace: apps
+spec:
+  headers:
+    accessControlAllowMethods:
+      - "GET"
+      - "POST"
+      - "PUT"
+      - "DELETE"
+      - "OPTIONS"
+    accessControlAllowHeaders:
+      - "Authorization"
+      - "Content-Type"
+      - "Accept"
+      - "Origin"
+      - "User-Agent"
+    accessControlAllowOriginList:
+      - "https://music.okloud-hub.com"
+    accessControlAllowCredentials: true
+    addVaryHeader: true
+---
 apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
 metadata:
   name: api-route
   namespace: apps
-  annotations:
-    traefik.ingress.kubernetes.io/router.tls: "true"
 spec:
   entryPoints:
     - websecure
+  routes:
+    - match: Host(`api.okloud-hub.com`)
+      kind: Rule
+      middlewares:
+        - name: cors-music-api
+          namespace: apps
+      services:
+        - name: music-server
+          port: 10000
   tls:
     secretName: tls-secret
-  routes:
-  - match: Host(`api.okloud-hub.com`)
-    kind: Rule
-    services:
-    - name: music-server
-      port: 10000
 
 ---
 apiVersion: traefik.containo.us/v1alpha1  # Notez le changement de traefik.io à traefik.containo.us
