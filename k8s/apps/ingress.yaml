@@ -3,7 +3,7 @@ apiVersion: traefik.containo.us/v1alpha1
 kind: Middleware
 metadata:
   name: redirect-https
-  namespace: certs
+  namespace: argocd
 spec:
   redirectScheme:
     scheme: https
@@ -55,7 +55,8 @@ spec:
     secretName: tls-secret
 
 ---
-apiVersion: traefik.containo.us/v1alpha1  # Notez le changement de traefik.io à traefik.containo.us
+# IngressRoute pour ArgoCD
+apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
 metadata:
   name: argocd-server
@@ -71,7 +72,7 @@ spec:
         - name: argocd-server
           port: 80
     - kind: Rule
-      match: Host(`argocd.okloud-hub.com`) && Headers(`Content-Type`, `application/grpc`)  # Notez 'Headers' au lieu de 'Header'
+      match: Host(`argocd.okloud-hub.com`) && Headers(`Content-Type`, `application/grpc`)
       priority: 11
       services:
         - name: argocd-server
@@ -79,9 +80,8 @@ spec:
           scheme: h2c
   tls:
     secretName: tls-secret
-    
 ---
-
+# ConfigMap pour les paramètres de ArgoCD
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -89,8 +89,6 @@ metadata:
   namespace: argocd
 data:
   server.insecure: "true"
-  url: http://192.168.1.97
-
 ---
 
 # ingress-routes.yaml
